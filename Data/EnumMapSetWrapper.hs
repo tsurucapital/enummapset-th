@@ -37,8 +37,12 @@ import Prelude
 import Control.Applicative
 import Control.Arrow
 import Data.List (nub)
-import Data.IntSet (IntSet, Key)
-import Data.IntMap (IntMap)
+import Data.IntSet (IntSet)
+import Data.IntMap (IntMap, Key)
+#if !MIN_VERSION_containers(0,5,1)
+import qualified Data.IntSet as IntSet
+import qualified Data.IntMap as IntMap
+#endif
 import Language.Haskell.TH.Syntax
 
 enumMap, enumSet :: Name
@@ -95,7 +99,11 @@ pos k typ = case typ of
         cxt = nub (a'cxt ++ b'cxt)
         wrap = post b'wrap `o` pre a'unwrap
 
+#if MIN_VERSION_containers(0,5,1)
     ConT ((==) ''Key -> True) ->
+#else
+    ConT ((||) <$> (==) ''Key <*> (==) ''Int -> True) ->
+#endif
         (VarE 'toEnum, [ClassP ''Enum [VarT k]], VarT k)
     ConT ((==) ''IntMap -> True) `AppT` v ->
         (ConE enumMap, [], enumMapT k v)
@@ -140,7 +148,11 @@ neg k typ = case typ of
         cxt = nub (a'cxt ++ b'cxt)
         unwrap = post b'unwrap `o` pre a'wrap
 
+#if MIN_VERSION_containers(0,5,1)
     ConT ((==) ''Key -> True) ->
+#else
+    ConT ((||) <$> (==) ''Key <*> (==) ''Int -> True) ->
+#endif
         (VarE 'fromEnum, [ClassP ''Enum [VarT k]], VarT k)
     ConT ((==) ''IntMap -> True) `AppT` v ->
         (unEnumMapE, [], enumMapT k v)
@@ -185,6 +197,21 @@ substT from to = subT where
 w, w' :: Name -> Q [Dec]
 (w, w') = (wrap True, wrap False) where
     wrap :: Bool -> Name -> Q [Dec]
+#if !MIN_VERSION_containers(0,5,1)
+    wrap _ name | name == 'IntMap.size = do
+        let size = mkName "size"
+        let a = mkName "a"
+        let t' = ForallT [PlainTV ki, PlainTV a] [] $
+                enumMapT ki (VarT a) `arrT` ConT ''Int
+        let body = NormalB (VarE name `o` unEnumMapE)
+        return [ inlineD size, SigD size t', ValD (VarP size) body [] ]
+    wrap _ name | name == 'IntSet.size = do
+        let size = mkName "size"
+        let t' = ForallT [PlainTV ki] [] $
+                enumSetT ki `arrT` ConT ''Int
+        let body = NormalB (VarE name `o` unEnumSetE)
+        return [ inlineD size, SigD size t', ValD (VarP size) body [] ]
+#endif
     wrap subst name@(mkName . nameBase -> base) = do
         VarI _name (pos ko -> (e, cxt', typ')) _dec _fixity <- reify name
         let ks = map PlainTV [ki, ko]
