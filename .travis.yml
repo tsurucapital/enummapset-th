@@ -1,3 +1,9 @@
 language: haskell
+
+before_install:
+  - ./.travis.install-deps --constraint="template-haskell == 2.7.0.0"
+
 install:
-  - cabal install
+  - cabal configure
+  - cabal build
+

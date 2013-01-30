@@ -1,0 +1,23 @@
+#! /bin/bash
+set -eu
+
+APT="sudo apt-get -q -y"
+CABAL_INSTALL_DEPS="cabal install --only-dependencies --force-reinstall"
+
+$APT update
+$APT install dctrl-tools
+
+# Find potential system packages to satisfy cabal dependencies
+deps()
+{
+	local M='^\([^ ]\+\)-[0-9.]\+ (.*$'
+	local G=' -o ( -FPackage -X libghc-\L\1\E-dev )'
+	local Q="s/QuickCheck/&2/"
+	local E="$($CABAL_INSTALL_DEPS "$@" --dry-run -v 2> /dev/null \
+		| sed -ne "$Q; s/$M/$G/p" | sort -u)"
+	grep-aptavail -n -sPackage \( -FNone -X None \) $E | sort -u
+}
+
+$APT install $(deps "$@")
+$CABAL_INSTALL_DEPS "$@" # Install the rest via Hackage
+
