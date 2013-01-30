@@ -10,12 +10,16 @@ description:
   The boilerplate is generated using Template Haskell, so unlike
   @enummapset@ it's easier to maintain and keep up-to-date with
   @containers@. On the downside, it's less portable.
+  .
+  Note that "Data.EnumMap.Lazy" and "Data.EnumMap.Strict" provide distinct
+  newtype wrappers, and their respective 'Functor' instances behave as
+  expected, unlike that of @IntMap@ which is alway lazy.
 homepage:       https://github.com/liyang/enummapset-th
 license:        BSD3
 license-file:   LICENSE
 author:         Liyang HU
 maintainer:     enummapset-th@liyang.hu
-copyright:      © 2012 Liyang HU
+copyright:      © 2013 Liyang HU
 category:       Data
 build-type:     Simple
 cabal-version:  >= 1.8
@@ -28,11 +32,9 @@ source-repository head
 
 library
     exposed-modules:
-        Data.EnumMap.Base
         Data.EnumMap.Lazy
         Data.EnumMap.Strict
         Data.EnumSet
-        Data.EnumSet.Base
     other-modules:
         Data.EnumMapSetWrapper
     build-depends:

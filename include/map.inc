@@ -1,8 +1,40 @@
--- Operators
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE Trustworthy #-}
+
+-- | Documentation: <http://hackage.haskell.org/packages/archive/containers/latest/doc/html/Data-IntMap-STRICT.html>
+module Data.EnumMap.STRICT where
+
+import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>), const)
+import Control.DeepSeq
+import Data.Data
+import Data.Foldable (Foldable)
+import Data.IntMap.STRICT
+import Data.Monoid
+import Data.Traversable
+import Text.ParserCombinators.ReadPrec
+import Text.Read
+import Text.Show
+
+import Data.EnumMapSetWrapper
+import Data.EnumSet (EnumSet (..))
+
+infixr 1 `EnumMap`
+newtype EnumMap k v = EnumMap { unEnumMap :: IntMap v } deriving
+    (Eq, Ord, Monoid, Typeable, Data, NFData)
+
+------------------------------------------------------------------------
+
+-- * Operators
 w '(!)
 w '(\\)
 
--- Query
+-- * Query
 w 'null
 w 'size
 w 'member
@@ -14,17 +46,17 @@ w 'lookupGT
 w 'lookupLE
 w 'lookupGE
 
--- Construction
+-- * Construction
 w 'empty
 w 'singleton
 
--- Insertion
+-- * Insertion
 w 'insert
 w 'insertWith
 w 'insertWithKey
 w 'insertLookupWithKey
 
--- Delete/Update
+-- * Delete/Update
 w 'delete
 w 'adjust
 w 'adjustWithKey
@@ -33,27 +65,27 @@ w 'updateWithKey
 w 'updateLookupWithKey
 w 'alter
 
--- Combine: Union
+-- * Combine: Union
 w 'union
 w 'unionWith
 w 'unionWithKey
 w 'unions
 w 'unionsWith
 
--- Combine: Difference
+-- * Combine: Difference
 w 'difference
 w 'differenceWith
 w 'differenceWithKey
 
--- Combine: Intersection
+-- * Combine: Intersection
 w 'intersection
 w 'intersectionWith
 w 'intersectionWithKey
 
--- Combine: Universal combining function
+-- * Combine: Universal combining function
 w 'mergeWithKey
 
--- Traversal: Map
+-- * Traversal: Map
 w 'map
 w 'mapWithKey
 w 'traverseWithKey
@@ -64,32 +96,32 @@ w' 'mapKeys
 w' 'mapKeysWith
 w' 'mapKeysMonotonic
 
--- Traversal: Folds
+-- * Traversal: Folds
 w 'foldr
 w 'foldl
 w 'foldrWithKey
 w 'foldlWithKey
 
--- Traversal: Strict folds
+-- * Traversal: Strict folds
 w 'foldr'
 w 'foldl'
 w 'foldrWithKey'
 w 'foldlWithKey'
 
--- Conversion
+-- * Conversion
 w 'elems
 w 'keys
 w 'assocs
 w 'keysSet
 w 'fromSet
 
--- Conversion: Lists
+-- * Conversion: Lists
 w 'toList
 w 'fromList
 w 'fromListWith
 w 'fromListWithKey
 
--- Conversion: Ordered lists
+-- * Conversion: Ordered lists
 w 'toAscList
 w 'toDescList
 w 'fromAscList
@@ -97,7 +129,7 @@ w 'fromAscListWith
 w 'fromAscListWithKey
 w 'fromDistinctAscList
 
--- Filter
+-- * Filter
 w 'filter
 w 'filterWithKey
 w 'partition
@@ -109,13 +141,13 @@ w 'mapEitherWithKey
 w 'split
 w 'splitLookup
 
--- Submap
+-- * Submap
 w 'isSubmapOf
 w 'isSubmapOfBy
 w 'isProperSubmapOf
 w 'isProperSubmapOfBy
 
--- Min/Max
+-- * Min/Max
 w 'findMin
 w 'findMax
 w 'deleteMin
@@ -131,9 +163,27 @@ w 'maxView
 w 'minViewWithKey
 w 'maxViewWithKey
 
--- Debugging
+-- * Debugging
 w 'showTree
 w 'showTreeWith
+
+------------------------------------------------------------------------
+
+instance Functor (EnumMap k) where
+    {-# INLINE fmap #-}
+    fmap = map
+
+deriving instance Foldable (EnumMap k)
+deriving instance Traversable (EnumMap k)
+
+instance (Enum k, Show k, Show a) => Show (EnumMap k a) where
+    showsPrec p m = showParen (p > 10) $
+        showString "fromList " . shows (toList m)
+
+instance (Enum k, Read k, Read a) => Read (EnumMap k a) where
+    readPrec = parens . prec 10 $ do
+        Ident "fromList" <- lexP
+        fromList `fmap` readPrec
 
 -- vim: ft=haskell:
 

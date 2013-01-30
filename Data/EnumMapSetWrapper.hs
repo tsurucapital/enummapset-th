@@ -1,8 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveFoldable #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveTraversable #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE Unsafe #-}
 {-# LANGUAGE ViewPatterns #-}
@@ -35,7 +31,7 @@ key type variables.
 
 -}
 
-module Data.EnumMapSetWrapper (EnumMap (..), EnumSet (..), w, w') where
+module Data.EnumMapSetWrapper (w, w') where
 
 import Prelude
 import Control.Applicative
@@ -45,18 +41,18 @@ import Data.IntSet (IntSet, Key)
 import Data.IntMap (IntMap)
 import Language.Haskell.TH.Syntax
 
-import Control.DeepSeq
-import Data.Foldable
-import Data.Traversable
-import Data.Typeable
-import Data.Data
-import Data.Monoid
+enumMap, enumSet :: Name
+enumMap = mkName "EnumMap"
+enumSet = mkName "EnumSet"
 
-newtype EnumMap k v = EnumMap { unEnumMap :: IntMap v } deriving
-    (Eq, Ord, Monoid, Functor, Foldable, Traversable, Typeable, Data, NFData)
+enumMapT :: Name -> Type -> Type
+enumMapT k v = ConT enumMap `AppT` VarT k `AppT` v
+enumSetT :: Name -> Type
+enumSetT k = ConT enumSet `AppT` VarT k
 
-newtype EnumSet k = EnumSet { unEnumSet :: IntSet } deriving
-    (Eq, Ord, Monoid, Typeable, Data, NFData)
+unEnumMapE, unEnumSetE :: Exp
+unEnumMapE = VarE (mkName "unEnumMap")
+unEnumSetE = VarE (mkName "unEnumSet")
 
 ------------------------------------------------------------------------
 
@@ -64,6 +60,9 @@ newtype EnumSet k = EnumSet { unEnumSet :: IntSet } deriving
 infixr 9 `o`
 o :: Exp -> Exp -> Exp
 o = flip UInfixE (VarE '(.))
+
+arrT :: Type -> Type -> Type
+arrT a b = ArrowT `AppT` a `AppT` b
 
 -- | @pre f ≃ (. f)@
 pre :: Exp -> Exp
@@ -90,7 +89,7 @@ pos k typ = case typ of
     ForallT tvs cxt t -> (wrap, [], ForallT tvs (nub $ cxt' ++ cxt) t') where
         (wrap, cxt', t') = pos k t
 
-    ArrowT `AppT` a `AppT` b -> (wrap, cxt, ArrowT `AppT` a' `AppT` b') where
+    ArrowT `AppT` a `AppT` b -> (wrap, cxt, a' `arrT` b') where
         (a'unwrap, a'cxt, a') = neg ki a
         (b'wrap, b'cxt, b') = pos ko b
         cxt = nub (a'cxt ++ b'cxt)
@@ -99,9 +98,9 @@ pos k typ = case typ of
     ConT ((==) ''Key -> True) ->
         (VarE 'toEnum, [ClassP ''Enum [VarT k]], VarT k)
     ConT ((==) ''IntMap -> True) `AppT` v ->
-        (ConE 'EnumMap, [], ConT ''EnumMap `AppT` VarT k `AppT` v)
+        (ConE enumMap, [], enumMapT k v)
     ConT ((==) ''IntSet -> True) ->
-        (ConE 'EnumSet, [], ConT ''EnumSet `AppT` VarT k)
+        (ConE enumSet, [], enumSetT k)
     ConT ((==) ''Maybe -> True) `AppT` a ->
             (VarE 'fmap `AppE` wrap, cxt, ConT ''Maybe `AppT` a') where
         (wrap, cxt, a') = pos k a
@@ -135,7 +134,7 @@ pos k typ = case typ of
 
 neg :: Name -> Type -> (Exp, Cxt, Type)
 neg k typ = case typ of
-    ArrowT `AppT` a `AppT` b -> (unwrap, cxt, ArrowT `AppT` a' `AppT` b') where
+    ArrowT `AppT` a `AppT` b -> (unwrap, cxt, a' `arrT` b') where
         (a'wrap, a'cxt, a') = pos ki a
         (b'unwrap, b'cxt, b') = neg ko b
         cxt = nub (a'cxt ++ b'cxt)
@@ -144,9 +143,9 @@ neg k typ = case typ of
     ConT ((==) ''Key -> True) ->
         (VarE 'fromEnum, [ClassP ''Enum [VarT k]], VarT k)
     ConT ((==) ''IntMap -> True) `AppT` v ->
-        (VarE 'unEnumMap, [], ConT ''EnumMap `AppT` VarT k `AppT` v)
+        (unEnumMapE, [], enumMapT k v)
     ConT ((==) ''IntSet -> True) ->
-        (VarE 'unEnumSet, [], ConT ''EnumSet `AppT` VarT k)
+        (unEnumSetE, [], enumSetT k)
 
     TupleT 2 `AppT` a `AppT` b ->
             (unwrap, cxt, TupleT 2 `AppT` a' `AppT` b') where
@@ -187,14 +186,19 @@ w, w' :: Name -> Q [Dec]
 (w, w') = (wrap True, wrap False) where
     wrap :: Bool -> Name -> Q [Dec]
     wrap subst name@(mkName . nameBase -> base) = do
-        VarI _name (pos ko -> (e, cxt', typ')) _dec fixity <- reify name
+        VarI _name (pos ko -> (e, cxt', typ')) _dec _fixity <- reify name
         let ks = map PlainTV [ki, ko]
         let t' = (if subst then substT ko ki else id) $ case typ' of
                 ForallT tvs cxt t ->
                     ForallT (ks ++ tvs) (nub $ cxt' ++ cxt) t
                 t -> ForallT ks cxt' t
         let body = NormalB (e `AppE` VarE name)
-        return [ InfixD fixity base
-            , PragmaD (InlineP base Inline FunLike AllPhases)
-            , SigD base t', ValD (VarP base) body [] ]
+        return [ inlineD base, SigD base t', ValD (VarP base) body [] ]
+
+    inlineD base = PragmaD $ InlineP base
+#if MIN_VERSION_template_haskell(2,8,0)
+        Inline FunLike AllPhases
+#else
+        (InlineSpec True False Nothing)
+#endif
 
