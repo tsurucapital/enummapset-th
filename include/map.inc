@@ -171,19 +171,19 @@ w 'showTreeWith
 
 instance Functor (EnumMap k) where
     {-# INLINE fmap #-}
-    fmap = map
+    fmap = Data.EnumMap.STRICT.map
 
 deriving instance Foldable (EnumMap k)
 deriving instance Traversable (EnumMap k)
 
 instance (Enum k, Show k, Show a) => Show (EnumMap k a) where
     showsPrec p m = showParen (p > 10) $
-        showString "fromList " . shows (toList m)
+        showString "fromList " . shows (Data.EnumMap.STRICT.toList m)
 
 instance (Enum k, Read k, Read a) => Read (EnumMap k a) where
     readPrec = parens . prec 10 $ do
         Ident "fromList" <- lexP
-        fromList `fmap` readPrec
+        Data.EnumMap.STRICT.fromList `fmap` readPrec
 
 -- vim: ft=haskell:
 
