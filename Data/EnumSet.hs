@@ -94,10 +94,10 @@ w 'showTreeWith
 
 instance (Enum k, Show k) => Show (EnumSet k) where
     showsPrec p s = showParen (p > 10) $
-        showString "fromList " . shows (toList s)
+        showString "fromList " . shows (Data.EnumSet.toList s)
 
 instance (Enum k, Read k) => Read (EnumSet k) where
     readPrec = parens . prec 10 $ do
         Ident "fromList" <- lexP
-        fmap fromList readPrec
+        fmap Data.EnumSet.fromList readPrec
 
