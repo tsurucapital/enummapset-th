@@ -10,7 +10,7 @@
 -- | Documentation: <http://hackage.haskell.org/packages/archive/containers/latest/doc/html/Data-IntMap-STRICT.html>
 module Data.EnumMap.STRICT where
 
-import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>), const)
+import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>))
 import Control.DeepSeq
 import Data.Data
 import Data.Foldable (Foldable)
