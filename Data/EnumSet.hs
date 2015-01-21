@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE KindSignatures #-}
 
 -- | Refer to the <http://hackage.haskell.org/package/containers/docs/Data-IntSet.html documentation>
 -- for "Data.IntSet".

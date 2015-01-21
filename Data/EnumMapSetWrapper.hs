@@ -104,7 +104,11 @@ pos k typ = case typ of
 #else
     ConT ((||) <$> (==) ''Key <*> (==) ''Int -> True) ->
 #endif
+#if MIN_VERSION_template_haskell(2,10,0)
+        (VarE 'toEnum, [ConT ''Enum `AppT` VarT k], VarT k)
+#else
         (VarE 'toEnum, [ClassP ''Enum [VarT k]], VarT k)
+#endif
     ConT ((==) ''IntMap -> True) `AppT` v ->
         (ConE enumMap, [], enumMapT k v)
     ConT ((==) ''IntSet -> True) ->
@@ -153,7 +157,11 @@ neg k typ = case typ of
 #else
     ConT ((||) <$> (==) ''Key <*> (==) ''Int -> True) ->
 #endif
+#if MIN_VERSION_template_haskell(2,10,0)
+        (VarE 'fromEnum, [ConT ''Enum `AppT` VarT k], VarT k)
+#else
         (VarE 'fromEnum, [ClassP ''Enum [VarT k]], VarT k)
+#endif
     ConT ((==) ''IntMap -> True) `AppT` v ->
         (unEnumMapE, [], enumMapT k v)
     ConT ((==) ''IntSet -> True) ->
@@ -190,9 +198,13 @@ substT from to = subT where
         KindedTV ((==) from -> True) k -> KindedTV to k
         _ -> tv
     subP :: Pred -> Pred
+#if MIN_VERSION_template_haskell(2,10,0)
+    subP = subT
+#else
     subP p = case p of
         ClassP c ts -> ClassP c (map subT ts)
         EqualP s t -> EqualP (subT s) (subT t)
+#endif
 
 w, w' :: Name -> Q [Dec]
 (w, w') = (wrap True, wrap False) where
