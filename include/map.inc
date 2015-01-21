@@ -7,7 +7,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE Trustworthy #-}
 
--- | Documentation: <http://hackage.haskell.org/packages/archive/containers/latest/doc/html/Data-IntMap-STRICT.html>
 module Data.EnumMap.STRICT where
 
 import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>))

@@ -3,7 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE Trustworthy #-}
 
--- | Documentation: <http://hackage.haskell.org/packages/archive/containers/latest/doc/html/Data-IntSet.html>
+-- | Refer to the <http://hackage.haskell.org/package/containers/docs/Data-IntSet.html documentation>
+-- for "Data.IntSet".
 module Data.EnumSet where
 
 import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>))
