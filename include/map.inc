@@ -100,6 +100,7 @@ w 'foldr
 w 'foldl
 w 'foldrWithKey
 w 'foldlWithKey
+w 'foldMapWithKey
 
 -- * Traversal: Strict folds
 w 'foldr'
