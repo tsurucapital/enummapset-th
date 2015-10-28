@@ -1,3 +1,7 @@
+notifications:
+  slack:
+    secure: "G4IBxMYZMPk9sQDltqewnM3+FgWSGx/HMHjpR10gJwmQBRDJWG+z/zdWd/fOzJ4vSnR2DTrnaUDbmKsygW3/R5p6WWD3+eeWwiHh+Mt2C4NTJQae5cHqlVcdissLR16GPvka0S+0PN6bffhUc4LIqytxEKA6TwghP4+8ljFR1i8="
+
 # This file has been generated -- see https://github.com/hvr/multi-ghc-travis
 language: c
 sudo: false
