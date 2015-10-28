@@ -34,7 +34,9 @@ key type variables.
 module Data.EnumMapSetWrapper (w, w') where
 
 import Prelude
+#if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
+#endif
 import Control.Arrow
 import Data.List (nub)
 import Data.IntSet (IntSet)
