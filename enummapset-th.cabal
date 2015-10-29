@@ -14,12 +14,12 @@ description:
   Note that "Data.EnumMap.Lazy" and "Data.EnumMap.Strict" provide distinct
   newtype wrappers, and their respective 'Functor' instances behave as
   expected, unlike that of @IntMap@ which is alway lazy.
-homepage:       https://github.com/liyang/enummapset-th
+homepage:       https://github.com/tsurucapital/enummapset-th
 license:        BSD3
 license-file:   LICENSE
 author:         Liyang HU
 maintainer:     enummapset-th@liyang.hu
-copyright:      © 2013 Liyang HU
+copyright:      © 2013−2015 Liyang HU
 category:       Data
 build-type:     Simple
 cabal-version:  >= 1.8
@@ -29,7 +29,7 @@ extra-source-files:
 
 source-repository head
     type:       git
-    location:   http://github.com/liyang/enummapset-th
+    location:   https://github.com/tsurucapital/enummapset-th.git
 
 library
     exposed-modules:
