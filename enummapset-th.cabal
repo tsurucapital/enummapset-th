@@ -23,7 +23,7 @@ copyright:      © 2013−2015 Liyang HU
 category:       Data
 build-type:     Simple
 cabal-version:  >= 1.8
-tested-with:    GHC == 7.8.3, GHC == 7.8.4, GHC == 7.10.2
+tested-with:    GHC == 7.8.3, GHC == 7.8.4, GHC == 7.10.2, GHC == 8.0.1
 extra-source-files:
     include/map.inc
 
