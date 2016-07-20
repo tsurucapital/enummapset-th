@@ -227,7 +227,12 @@ w, w' :: Name -> Q [Dec]
         return [ inlineD size, SigD size t', ValD (VarP size) body [] ]
 #endif
     wrap subst name@(mkName . nameBase -> base) = do
-        VarI _name (pos ko -> (e, cxt', typ')) _dec _fixity <- reify name
+#if MIN_VERSION_template_haskell(2,11,0)
+        VarI _name (pos ko -> (e, cxt', typ')) _dec
+#else
+        VarI _name (pos ko -> (e, cxt', typ')) _dec _fixity
+#endif
+            <- reify name
         let ks = map PlainTV [ki, ko]
         let t' = (if subst then substT ko ki else id) $ case typ' of
                 ForallT tvs cxt t ->
