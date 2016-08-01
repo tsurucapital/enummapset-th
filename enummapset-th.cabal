@@ -1,5 +1,5 @@
 name:           enummapset-th
-version:        0.6.1.0
+version:        0.6.1.1
 synopsis:       TH-generated EnumSet/EnumMap wrappers around IntSet/IntMap.
 description:
   This package wraps @IntSet@ and @IntMap@ from @containers@, and provides
