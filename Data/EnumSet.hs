@@ -13,6 +13,7 @@ import Control.DeepSeq
 import Data.IntSet
 import Data.Typeable
 import Data.Data
+import Data.Semigroup
 import Data.Monoid
 import Text.ParserCombinators.ReadPrec
 import Text.Read
@@ -21,7 +22,7 @@ import Text.Show
 import Data.EnumMapSetWrapper
 
 newtype EnumSet k = EnumSet { unEnumSet :: IntSet } deriving
-    (Eq, Ord, Monoid, Typeable, Data, NFData)
+    (Eq, Ord, Semigroup, Monoid, Typeable, Data, NFData)
 
 -- * Operators
 w '(\\)
