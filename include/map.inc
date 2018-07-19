@@ -13,7 +13,8 @@ import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>))
 import Control.DeepSeq
 import Data.Data
 import Data.Foldable (Foldable)
-import Data.IntMap.STRICT
+import Data.IntMap.STRICT hiding (showTree, showTreeWith)
+import Data.IntMap.Internal.Debug
 import Data.Semigroup
 import Data.Monoid
 import Data.Traversable
