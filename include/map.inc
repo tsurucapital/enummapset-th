@@ -15,6 +15,7 @@ import Data.Data
 import Data.Foldable (Foldable)
 import Data.IntMap.STRICT
 import Data.Monoid
+import Data.Semigroup (Semigroup)
 import Data.Traversable
 import Text.ParserCombinators.ReadPrec
 import Text.Read
@@ -25,7 +26,7 @@ import Data.EnumSet (EnumSet (..))
 
 infixr 1 `EnumMap`
 newtype EnumMap k v = EnumMap { unEnumMap :: IntMap v } deriving
-    (Eq, Ord, Monoid, Typeable, Data, NFData)
+    (Eq, Ord, Semigroup, Monoid, Typeable, Data, NFData)
 
 ------------------------------------------------------------------------
 
