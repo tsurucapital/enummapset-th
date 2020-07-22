@@ -13,7 +13,9 @@ import Prelude (Eq, Ord, Enum, Functor (..), (.), ($), (>))
 import Control.DeepSeq
 import Data.Data
 import Data.Foldable (Foldable)
-import Data.IntMap.STRICT
+import Data.IntMap.STRICT hiding (showTree, showTreeWith)
+import Data.IntMap.Internal.Debug
+import Data.Semigroup
 import Data.Monoid
 import Data.Traversable
 import Text.ParserCombinators.ReadPrec
@@ -25,7 +27,7 @@ import Data.EnumSet (EnumSet (..))
 
 infixr 1 `EnumMap`
 newtype EnumMap k v = EnumMap { unEnumMap :: IntMap v } deriving
-    (Eq, Ord, Monoid, Typeable, Data, NFData)
+    (Eq, Ord, Semigroup, Monoid, Typeable, Data, NFData)
 
 ------------------------------------------------------------------------
 

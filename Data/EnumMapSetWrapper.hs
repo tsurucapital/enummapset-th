@@ -180,6 +180,10 @@ neg k typ = case typ of
         (a'unwrap, cxt, a') = neg k a
         unwrap = VarE 'map `AppE` a'unwrap
 
+    VarT v `AppT` a -> (unwrap, AppT (ConT ''Functor) (VarT v) : cxt, VarT v `AppT` a') where
+        (a'unwrap, cxt, a') = neg k a
+        unwrap = VarE 'fmap `AppE` a'unwrap
+
     _ -> (VarE 'id, [], typ)
 
 ------------------------------------------------------------------------
