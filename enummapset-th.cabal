@@ -1,5 +1,5 @@
 name:           enummapset-th
-version:        0.6.1.1
+version:        0.6.2
 synopsis:       TH-generated EnumSet/EnumMap wrappers around IntSet/IntMap.
 description:
   This package wraps @IntSet@ and @IntMap@ from @containers@, and provides
@@ -26,6 +26,8 @@ cabal-version:  >= 1.8
 tested-with:    GHC == 8.6.5, GHC == 8.8.4, GHC == 8.10.1
 extra-source-files:
     include/map.inc
+    README.md
+    CHANGELOG.md
 
 source-repository head
     type:       git
