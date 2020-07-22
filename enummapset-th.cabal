@@ -1,3 +1,4 @@
+cabal-version:  2.4
 name:           enummapset-th
 version:        0.6.2
 synopsis:       TH-generated EnumSet/EnumMap wrappers around IntSet/IntMap.
@@ -15,14 +16,13 @@ description:
   newtype wrappers, and their respective 'Functor' instances behave as
   expected, unlike that of @IntMap@ which is alway lazy.
 homepage:       https://github.com/tsurucapital/enummapset-th
-license:        BSD3
+license:        BSD-3-Clause
 license-file:   LICENSE
 author:         Liyang HU
 maintainer:     Fumiaki Kinoshita <fumiexcel@gmail.com>
 copyright:      © 2013−2015 Liyang HU
 category:       Data
 build-type:     Simple
-cabal-version:  >= 1.8
 tested-with:    GHC == 8.6.5, GHC == 8.8.4, GHC == 8.10.1
 extra-source-files:
     include/map.inc
@@ -47,6 +47,7 @@ library
         template-haskell >= 2.7
     include-dirs: include
     ghc-options: -Wall
+    default-language: Haskell2010
 
 -- vim: et sw=4 ts=4 sts=4:
 
